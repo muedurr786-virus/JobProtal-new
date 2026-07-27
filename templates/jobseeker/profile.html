@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - JobPortal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-custom">
+                    <div class="card-header-custom text-center">
+                        <i class="fas fa-user-edit fa-2x mb-2"></i>
+                        <h4 class="fw-bold mb-0">My Profile</h4>
+                        <p class="mb-0 opacity-75">
+                            {% if profile_exists %}Update your personal information{% else %}Complete your profile to apply for jobs{% endif %}
+                        </p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="text-center mb-4">
+                                {% if form.instance.image %}
+                                    <img src="{{ form.instance.image.url }}" class="image-preview mb-2" alt="Profile">
+                                {% else %}
+                                    <div class="image-preview d-flex align-items-center justify-content-center bg-light mx-auto mb-2">
+                                        <i class="fas fa-user fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_name" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Full Name
+                                    </label>
+                                    {{ form.name }}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="id_phone" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Phone Number
+                                    </label>
+                                    {{ form.phone }}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="id_address" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Address
+                                    </label>
+                                    {{ form.address }}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="id_skill" class="form-label">
+                                        <i class="fas fa-tags me-1"></i>Skills (comma separated)
+                                    </label>
+                                    {{ form.skill }}
+                                    <div class="form-text">e.g., Python, Django, JavaScript</div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="id_image" class="form-label">
+                                        <i class="fas fa-image me-1"></i>Photo
+                                    </label>
+                                    {{ form.image }}
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="id_resume" class="form-label">
+                                        <i class="fas fa-file-pdf me-1"></i>Resume
+                                    </label>
+                                    {{ form.resume }}
+                                    {% if form.instance.resume %}
+                                    <div class="mt-1">
+                                        <a href="{{ form.instance.resume.url }}" class="small" style="color: var(--primary);">
+                                            View Current
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if not form.instance.resume %}
+                            <div class="alert alert-warning mt-3 rounded-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Please upload your resume to apply for jobs
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mt-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary-custom">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if profile_exists %}Update Profile{% else %}Save Profile{% endif %}
+                                </button>
+                                <a href="{% url 'jobapp:job_list' %}" class="btn btn-outline-custom">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

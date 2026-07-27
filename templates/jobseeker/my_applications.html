@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - JobPortal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="section-title mb-0">My Applications</h2>
+                <p class="text-muted">Track your job applications</p>
+            </div>
+            <a href="{% url 'jobapp:job_list' %}" class="btn btn-primary-custom">
+                <i class="fas fa-search me-2"></i>Find More Jobs
+            </a>
+        </div>
+        
+        {% if applications %}
+        <div class="card-custom">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background: var(--light);">
+                        <tr>
+                            <th class="py-3 px-4">Job Title</th>
+                            <th class="py-3 px-4">Company</th>
+                            <th class="py-3 px-4">Category</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td class="py-3 px-4">
+                                <h6 class="fw-bold mb-0">{{ application.job.titel }}</h6>
+                                <small class="text-muted">
+                                    {% for skill in application.job.skill_set.all|slice:":2" %}
+                                        {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if application.job.skill_set.all|length > 2 %}...{% endif %}
+                                </small>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="d-flex align-items-center">
+                                    {% if application.job.user.recuitermodel.image %}
+                                        <img src="{{ application.job.user.recuitermodel.image.url }}" 
+                                             class="me-2" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;">
+                                    {% endif %}
+                                    <span>{{ application.job.user.recuitermodel.company|default:"N/A" }}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge-category">{{ application.job.category }}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge-status badge-{{ application.status|lower }}">
+                                    {{ application.status }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <a href="{% url 'jobapp:job_detail' application.job.pk %}" class="btn btn-sm btn-outline-custom">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Applications Yet</h4>
+            <p class="text-muted">Start applying for jobs to see them here</p>
+            <a href="{% url 'jobapp:job_list' %}" class="btn btn-primary-custom">
+                <i class="fas fa-search me-2"></i>Browse Jobs
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

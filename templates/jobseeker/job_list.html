@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Jobs - JobPortal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="section-title">Find Your Dream Job</h2>
+            <p class="section-subtitle">Browse through our latest opportunities</p>
+        </div>
+        
+        <!-- Search & Filters -->
+        <div class="filter-section mb-4">
+            <form method="get" id="filterForm">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--light); border: 2px solid var(--border); border-right: 0;">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="search" class="form-control" 
+                                   value="{{ search }}" placeholder="Search jobs, companies, skills..."
+                                   style="border-left: 0;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for value, label in categories %}
+                            <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="skill" class="form-select">
+                            <option value="">All Skills</option>
+                            {% for skill in skills %}
+                            <option value="{{ skill.id }}" {% if selected_skill == skill.id|stringformat:"s" %}selected{% endif %}>
+                                {{ skill.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary-custom w-100 h-100">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                {% if search or selected_category or selected_skill %}
+                <div class="mt-2">
+                    <a href="{% url 'jobapp:job_list' %}" class="text-decoration-none small" style="color: var(--danger);">
+                        <i class="fas fa-times me-1"></i>Clear Filters
+                    </a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+        
+        <!-- Results Count -->
+        <div class="mb-3">
+            <span class="text-muted">
+                Showing <strong>{{ jobs|length }}</strong> jobs found
+            </span>
+        </div>
+        
+        <!-- Job List -->
+        {% if jobs %}
+        <div class="row g-4">
+            {% for job in jobs %}
+            <div class="col-lg-6">
+                <div class="card-custom h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center">
+                                {% if job.user.recuitermodel.image %}
+                                    <img src="{{ job.user.recuitermodel.image.url }}" 
+                                         class="me-3" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover;" 
+                                         alt="{{ job.user.recuitermodel.company }}">
+                                {% else %}
+                                    <div class="me-3 d-flex align-items-center justify-content-center" 
+                                         style="width: 50px; height: 50px; border-radius: 12px; background: var(--light);">
+                                        <i class="fas fa-building text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="fw-bold mb-0">{{ job.titel }}</h6>
+                                    <small class="text-muted">{{ job.user.recuitermodel.company|default:"Company" }}</small>
+                                </div>
+                            </div>
+                            <span class="badge-category">{{ job.category }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {% for skill in job.skill_set.all %}
+                                <span class="badge-skill me-1">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                <span class="me-3"><i class="fas fa-users me-1"></i>{{ job.number_opening }} openings</span>
+                            </div>
+                            <a href="{% url 'jobapp:job_detail' job.pk %}" class="btn btn-primary-custom btn-sm">
+                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&category={{ selected_category }}&skill={{ selected_skill }}">&laquo;</a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}&category={{ selected_category }}&skill={{ selected_skill }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&category={{ selected_category }}&skill={{ selected_skill }}">&raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Jobs Found</h4>
+            <p class="text-muted">Try adjusting your search criteria or browse all jobs</p>
+            <a href="{% url 'jobapp:job_list' %}" class="btn btn-primary-custom">
+                <i class="fas fa-list me-2"></i>View All Jobs
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

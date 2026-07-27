@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - JobPortal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="hero-title animate-fadeInUp">
+                    Find Your <br>
+                    <span style="color: var(--secondary);">Dream Job</span> Today
+                </h1>
+                <p class="hero-subtitle animate-fadeInUp" style="animation-delay: 0.1s;">
+                    Connect with thousands of employers and discover opportunities 
+                    that match your skills and aspirations.
+                </p>
+                <div class="mt-4 animate-fadeInUp" style="animation-delay: 0.2s;">
+                    {% if user.is_authenticated %}
+                        {% if user.user_type == 'JobSeeker' %}
+                            <a href="{% url 'jobapp:job_list' %}" class="btn btn-secondary-custom btn-lg me-3">
+                                <i class="fas fa-search me-2"></i>Find Jobs
+                            </a>
+                        {% else %}
+                            <a href="{% url 'jobapp:job_post' %}" class="btn btn-secondary-custom btn-lg me-3">
+                                <i class="fas fa-plus me-2"></i>Post a Job
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'jobapp:register' %}" class="btn btn-secondary-custom btn-lg me-3">
+                            <i class="fas fa-rocket me-2"></i>Get Started
+                        </a>
+                        <a href="{% url 'jobapp:job_list' %}" class="btn btn-outline-custom btn-lg" style="border-color: white; color: white;">
+                            Browse Jobs
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <i class="fas fa-users" style="font-size: 15rem; opacity: 0.2;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-number">{{ total_jobs }}</div>
+                    <div class="stat-label">Active Jobs</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--secondary);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-number">{{ total_seekers }}</div>
+                    <div class="stat-label">Job Seekers</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-number">{{ total_recruiters }}</div>
+                    <div class="stat-label">Recruiters</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Jobs Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Latest Opportunities</h2>
+            <p class="section-subtitle">Explore the most recent job postings from top companies</p>
+        </div>
+        
+        {% if recent_jobs %}
+        <div class="row g-4">
+            {% for job in recent_jobs %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge-category">{{ job.category }}</span>
+                            <small class="text-muted">{{ job.number_opening }} openings</small>
+                        </div>
+                        <h5 class="fw-bold mb-2">{{ job.titel }}</h5>
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-building me-1"></i>
+                            {{ job.user.recuitermodel.company|default:"Company" }}
+                        </p>
+                        <div class="mb-3">
+                            {% for skill in job.skill_set.all %}
+                                <span class="badge-skill me-1">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'jobapp:job_detail' job.pk %}" class="btn btn-outline-custom btn-sm w-100">
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No jobs posted yet. Be the first to post!</p>
+        </div>
+        {% endif %}
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'jobapp:job_list' %}" class="btn btn-primary-custom">
+                View All Jobs <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+{% if skills %}
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Popular Skills</h2>
+            <p class="section-subtitle">In-demand skills that employers are looking for</p>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            {% for skill in skills %}
+            <span class="badge-skill" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                <i class="fas fa-tag me-1"></i>{{ skill.name }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center p-5 rounded-4" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                    <h3 class="text-white fw-bold mb-3">Ready to Take the Next Step?</h3>
+                    <p class="text-white-50 mb-4">
+                        Whether you're looking for talent or seeking opportunities, 
+                        we've got you covered.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'jobapp:register' %}" class="btn btn-secondary-custom btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Join Now
+                        </a>
+                        <a href="{% url 'jobapp:job_list' %}" class="btn btn-lg" style="background: rgba(255,255,255,0.2); color: white;">
+                            Explore Jobs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

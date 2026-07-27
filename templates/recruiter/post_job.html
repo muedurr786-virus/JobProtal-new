@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job - JobPortal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .skill-checkbox {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        margin: 0.25rem;
+        background: var(--light);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .skill-checkbox:hover {
+        background: rgba(79, 70, 229, 0.1);
+    }
+    .skill-checkbox input {
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-custom">
+                    <div class="card-header-custom text-center">
+                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                        <h4 class="fw-bold mb-0">Post New Job</h4>
+                        <p class="mb-0 opacity-75">Create a new job listing</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="id_titel" class="form-label">
+                                        <i class="fas fa-heading me-1"></i>Job Title
+                                    </label>
+                                    {{ form.titel }}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="id_number_opening" class="form-label">
+                                        <i class="fas fa-users me-1"></i>Openings
+                                    </label>
+                                    {{ form.number_opening }}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="id_category" class="form-label">
+                                        <i class="fas fa-tag me-1"></i>Job Category
+                                    </label>
+                                    {{ form.category }}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <i class="fas fa-code me-1"></i>Required Skills
+                                    </label>
+                                    <div class="p-3 rounded-3" style="background: var(--light); border: 2px solid var(--border);">
+                                        {% for skill in skills %}
+                                        <label class="skill-checkbox">
+                                            <input type="checkbox" name="skill_set" value="{{ skill.id }}" id="skill_{{ skill.id }}">
+                                            {{ skill.name }}
+                                        </label>
+                                        {% empty %}
+                                        <p class="text-muted mb-0">
+                                            No skills available. 
+                                            <a href="{% url 'jobapp:add_skill' %}">Add skills first</a>
+                                        </p>
+                                        {% endfor %}
+                                    </div>
+                                    {% if form.skill_set.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.skill_set.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary-custom">
+                                    <i class="fas fa-paper-plane me-2"></i>Publish Job
+                                </button>
+                                <a href="{% url 'jobapp:my_posts' %}" class="btn btn-outline-custom">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Skills - JobPortal{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card-custom mb-4">
+                    <div class="card-header-custom text-center">
+                        <i class="fas fa-tags fa-2x mb-2"></i>
+                        <h4 class="fw-bold mb-0">Add New Skill</h4>
+                        <p class="mb-0 opacity-75">Add skills for job postings</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="id_name" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Skill Name
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100">
+                                <i class="fas fa-plus me-2"></i>Add Skill
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Existing Skills -->
+                {% if skills %}
+                <div class="card-custom">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Existing Skills ({{ skills|length }})</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in skills %}
+                            <span class="badge-skill" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-check me-1"></i>{{ skill.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

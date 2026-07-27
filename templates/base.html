@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JobPortal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+            --border: #E5E7EB;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column;}
+        
+        .navbar-custom { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0.75rem 0; }
+        .navbar-brand { font-weight: 800; font-size: 1.5rem; color: var(--primary) !important; }
+        .navbar-brand i { color: var(--secondary); }
+        .nav-link { font-weight: 500; color: var(--dark) !important; margin: 0 0.25rem; padding: 0.5rem 1rem !important; border-radius: 8px; transition: all 0.3s ease; }
+        .nav-link:hover { background-color: var(--light); color: var(--primary) !important; }
+        
+        .btn-primary-custom { background: var(--primary); border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; color: white;}
+        .btn-primary-custom:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); color: white;}
+        .btn-secondary-custom { background: var(--secondary); border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600; color: white; transition: all 0.3s ease; }
+        .btn-secondary-custom:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); color: white;}
+        .btn-outline-custom { border: 2px solid var(--primary); color: var(--primary); padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600; background: transparent; transition: all 0.3s ease; }
+        .btn-outline-custom:hover { background: var(--primary); color: white; }
+        .btn-danger-custom { background: var(--danger); border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; color: white;}
+        .btn-danger-custom:hover { background: #DC2626; color: white;}
+        
+        .card-custom { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; background: white; }
+        .card-custom:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+        .card-header-custom { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 1.5rem; color: white; }
+        
+        .form-control, .form-select { border: 2px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.95rem; transition: all 0.3s ease; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .form-label { font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; }
+        
+        .hero-section { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A855F7 100%); padding: 5rem 0; color: white; position: relative; overflow: hidden; }
+        .hero-section::before { content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; }
+        
+        .badge-category { background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem; }
+        .badge-skill { background: rgba(16, 185, 129, 0.1); color: var(--secondary); padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 500; font-size: 0.75rem; }
+        .badge-status { padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem; }
+        .badge-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .badge-shortlist { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .badge-reject { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
+        .section-title { font-size: 2rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem; }
+        .section-subtitle { color: var(--gray); font-size: 1.1rem; }
+        
+        .alert-custom { border: none; border-radius: 12px; padding: 1rem 1.25rem; font-weight: 500; }
+        .user-type-badge { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .recruiter-badge { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
+        .jobseeker-badge { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+
+        /* Sticky Footer */
+        main { flex: 1; }
+        .footer { background: var(--dark); color: white; padding: 3rem 0 1.5rem; margin-top: auto; }
+        .footer a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s ease; }
+        .footer a:hover { color: var(--secondary); }
+        .footer-logout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; cursor: pointer;}
+        .footer-logout-btn:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .hero-section { padding: 3rem 0; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'jobapp:home' %}">
+                <i class="fas fa-briefcase me-2"></i>JobPortal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'jobapp:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user.user_type == 'JobSeeker' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:job_list' %}"><i class="fas fa-search me-1"></i>Find Jobs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:my_applications' %}"><i class="fas fa-file-alt me-1"></i>My Applications</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:jobseeker_profile' %}"><i class="fas fa-user me-1"></i>Profile</a></li>
+                        {% elif user.user_type == 'Recuiter' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:my_posts' %}"><i class="fas fa-list me-1"></i>My Jobs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:job_post' %}"><i class="fas fa-plus me-1"></i>Post Job</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'jobapp:recruiter_profile' %}"><i class="fas fa-building me-1"></i>Company</a></li>
+                        {% endif %}
+                        
+                        <li class="nav-item ms-2 d-flex align-items-center">
+                            <span class="me-2">
+                                <span class="user-type-badge {% if user.user_type == 'Recuiter' %}recruiter-badge{% else %}jobseeker-badge{% endif %}">
+                                    {{ user.user_type }}
+                                </span>
+                            </span>
+                            <span class="fw-bold d-none d-md-inline">{{ user.display_name|default:user.username }}</span>
+                        </li>
+                        
+                        <!-- NAVBAR LOGOUT BUTTON (POST Method) -->
+                        <li class="nav-item ms-2">
+                            <form method="post" action="{% url 'jobapp:logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger-custom btn-sm" onclick="return confirm('Are you sure you want to logout?')">
+                                    <i class="fas fa-sign-out-alt me-1"></i><span class="d-none d-md-inline">Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="btn btn-outline-custom btn-sm me-2" href="{% url 'jobapp:login' %}">Login</a></li>
+                        <li class="nav-item"><a class="btn btn-primary-custom btn-sm" href="{% url 'jobapp:register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-custom alert-dismissible fade show" role="alert">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer with Logout -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-briefcase me-2"></i>JobPortal</h5>
+                    <p class="text-muted">Connect with top employers and find your dream job. Your career journey starts here.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'jobapp:home' %}">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'jobapp:job_list' %}">Browse Jobs</a></li>
+                        <li class="mb-2"><a href="{% url 'jobapp:register' %}">Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Contact Us</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>info@jobportal.com</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</li>
+                    </ul>
+                </div>
+                
+                <!-- FOOTER LOGOUT SECTION -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Account</h6>
+                    {% if user.is_authenticated %}
+                        <p class="text-muted small mb-2">Logged in as <strong class="text-white">{{ user.username }}</strong></p>
+                        <form method="post" action="{% url 'jobapp:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="footer-logout-btn w-100">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout from Account
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'jobapp:login' %}" class="footer-logout-btn d-block text-center"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+                            <a href="{% url 'jobapp:register' %}" class="footer-logout-btn d-block text-center" style="background: var(--secondary); border-color: var(--secondary);"><i class="fas fa-user-plus me-2"></i>Register</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center text-muted">
+                <p class="mb-0">&copy; 2024 JobPortal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

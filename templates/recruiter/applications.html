@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Applications - JobPortal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .application-card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    .application-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .applicant-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--border);
+    }
+    .status-form select {
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <!-- Back Button & Title -->
+        <div class="mb-4">
+            <a href="{% url 'jobapp:my_posts' %}" class="text-decoration-none" style="color: var(--primary);">
+                <i class="fas fa-arrow-left me-1"></i>Back to My Jobs
+            </a>
+        </div>
+        
+        <div class="card-custom mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3 class="fw-bold">{{ job.titel }}</h3>
+                        <span class="badge-category">{{ job.category }}</span>
+                        <span class="text-muted ms-2">{{ job.number_opening }} openings</span>
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-4 fw-bold" style="color: var(--primary);">{{ applications|length }}</div>
+                        <small class="text-muted">Applications</small>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    {% for skill in job.skill_set.all %}
+                        <span class="badge-skill">{{ skill.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <h4 class="fw-bold mb-3">Applicants</h4>
+        
+        {% if applications %}
+        {% for application in applications %}
+        <div class="application-card">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center mb-3 mb-md-0">
+                    {% if application.job_post.image %}
+                        <img src="{{ application.job_post.image.url }}" class="applicant-avatar" alt="{{ application.job_post.name }}">
+                    {% else %}
+                        <div class="applicant-avatar d-flex align-items-center justify-content-center bg-light mx-auto">
+                            <i class="fas fa-user text-muted"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h6 class="fw-bold mb-1">{{ application.job_post.name|default:"Applicant" }}</h6>
+                    <small class="text-muted d-block">
+                        <i class="fas fa-phone me-1"></i>{{ application.job_post.phone|default:"N/A" }}
+                    </small>
+                    <small class="text-muted d-block">
+                        <i class="fas fa-tag me-1"></i>{{ application.job_post.skill|default:"N/A" }}
+                    </small>
+                </div>
+                <div class="col-md-2 mb-3 mb-md-0">
+                    {% if application.job_post.resume %}
+                    <a href="{{ application.job_post.resume.url }}" class="btn btn-sm btn-outline-custom" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i>Resume
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="col-md-2 mb-3 mb-md-0">
+                    <span class="badge-status badge-{{ application.status|lower }}">
+                        {{ application.status }}
+                    </span>
+                </div>
+                <div class="col-md-2">
+                    <form method="post" action="{% url 'jobapp:update_application' application.pk %}" class="status-form">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No Applications Yet</h5>
+            <p class="text-muted">Wait for job seekers to apply for this position</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    // Confirm before changing status
+    document.querySelectorAll('.status-form select').forEach(select => {
+        select.addEventListener('change', function(e) {
+            if (!confirm('Are you sure you want to update this application status?')) {
+                e.preventDefault();
+                this.value = this.querySelector('option[selected]').value;
+            }
+        });
+    });
+</script>
+{% endblock %}
